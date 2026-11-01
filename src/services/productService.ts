@@ -1,4 +1,5 @@
 import type { Product } from "../types/product";
+import { extractErrorMessage } from "../utils/extractErrorMessage";
 
 const BASE_URL = 'http://localhost:8080/api/products';
 
@@ -7,7 +8,8 @@ export function productService() {
         const response = await fetch(`${BASE_URL}/all`);
 
         if (!response.ok) {
-            throw new Error("Falha ao buscar produtos do servidor.")
+            const errorMessage = await extractErrorMessage(response, "Falha ao buscar produtos do servidor.")
+            throw new Error(errorMessage)
         }
 
         return response.json();
@@ -19,7 +21,8 @@ export function productService() {
         });
 
         if (!response.ok) {
-            throw new Error("Erro ao processar e raspar o produto.");
+            const errorMessage = await extractErrorMessage(response, "Erro ao processar e raspar o produto.")
+            throw new Error(errorMessage);
         }
 
         return response.json();

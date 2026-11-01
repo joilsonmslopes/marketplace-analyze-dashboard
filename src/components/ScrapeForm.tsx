@@ -1,9 +1,10 @@
 import { Box, Button, CircularProgress, Paper, TextField } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import { useState, type SyntheticEvent } from "react";
+import type { Product } from "../types/product";
 
 interface ScrapeFormProps {
-    onScrape: (url: string) => Promise<void> | void;
+    onScrape: (url: string) => Promise<Product> | void;
     isLoading: boolean;
 }
 

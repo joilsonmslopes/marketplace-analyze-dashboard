@@ -21,7 +21,7 @@ const theme = createTheme({
 });
 
 function App() {
-  const { products, loading, scraping, error, scrapeUrl } = useProducts();
+  const { products, loading, scraping, error, scrapeUrlMutate } = useProducts();
 
   return (
     <ThemeProvider theme={theme}>
@@ -29,7 +29,7 @@ function App() {
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Header />
 
-        <ScrapeForm onScrape={scrapeUrl} isLoading={scraping} />
+        <ScrapeForm onScrape={scrapeUrlMutate} isLoading={scraping} />
 
         {error && (
           <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>

@@ -1,52 +1,37 @@
-import { useCallback, useEffect, useState } from "react";
 import { type Product } from "../types/product";
 import { productService } from "../services/productService";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useProducts() {
-    const [products, setProducts] = useState<Product[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [scraping, setScraping] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
+    const queryClient = useQueryClient();
+    const { getAll, scrapeUrl } = productService();
 
-    const { getAll, scrapeUrl: productServiceScrapeUrl } = productService();
+    const {
+        data: products = [],
+        isLoading,
+        error,
+        refetch
+    } = useQuery({
+        queryKey: ['products'],
+        queryFn: getAll
+    });
 
-    const fetchProducts = useCallback(async () => {
-        try {
-            setLoading(true);
-            setError(null);
-            const data = await getAll();
-            setProducts(data);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Erro ao carregar produtos.');
-        } finally {
-            setLoading(false);
+    const {
+        mutateAsync: scrapeUrlMutate,
+        isPending: scraping
+    } = useMutation({
+        mutationFn: scrapeUrl,
+        onSuccess: (newProduct) => {
+            queryClient.setQueryData<Product[]>(['products'], (old = []) => [newProduct, ...old]);
         }
-    }, []);
-
-    useEffect(() => {
-        fetchProducts();
-    }, [fetchProducts])
-
-    const scrapeUrl = async (url: string) => {
-        try {
-            setScraping(true);
-            setError(null);
-            const newProduct = await productServiceScrapeUrl(url);
-            setProducts((prev) => [newProduct, ...prev]);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Falha ao analisar o link informado.');
-            throw err;
-        } finally {
-            setScraping(false);
-        }
-    };
+    })
 
     return {
         products,
-        loading,
+        loading: isLoading,
         scraping,
-        error,
-        scrapeUrl,
-        refetch: fetchProducts
+        error: error instanceof Error ? error.message : null,
+        scrapeUrlMutate,
+        refetch
     };
 }

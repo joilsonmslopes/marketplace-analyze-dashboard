@@ -1,11 +1,11 @@
-import type { Product } from "../types/product";
+import type { Product, ProductSortOption } from "../types/product";
 import { extractErrorMessage } from "../utils/extractErrorMessage";
 
 const BASE_URL = 'http://localhost:8080/api/products';
 
 export function productService() {
-    async function getAll(): Promise<Product[]> {
-        const response = await fetch(`${BASE_URL}/all`);
+    async function getAll(sort: ProductSortOption = 'NAME_ASC'): Promise<Product[]> {
+        const response = await fetch(`${BASE_URL}/all?sort=${sort}`);
 
         if (!response.ok) {
             const errorMessage = await extractErrorMessage(response, "Falha ao buscar produtos do servidor.")

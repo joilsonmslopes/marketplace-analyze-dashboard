@@ -1,9 +1,11 @@
-import { type Product } from "../types/product";
+import { type ProductSortOption } from "../types/product";
 import { productService } from "../services/productService";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
 export function useProducts() {
     const queryClient = useQueryClient();
+    const [sortOption, setSortOption] = useState<ProductSortOption>('NAME_ASC');
     const { getAll, scrapeUrl } = productService();
 
     const {
@@ -12,8 +14,8 @@ export function useProducts() {
         error,
         refetch
     } = useQuery({
-        queryKey: ['products'],
-        queryFn: getAll
+        queryKey: ['products', sortOption],
+        queryFn: () => getAll(sortOption)
     });
 
     const {
@@ -21,8 +23,8 @@ export function useProducts() {
         isPending: scraping
     } = useMutation({
         mutationFn: scrapeUrl,
-        onSuccess: (newProduct) => {
-            queryClient.setQueryData<Product[]>(['products'], (old = []) => [newProduct, ...old]);
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['products'] });
         }
     })
 
@@ -32,6 +34,8 @@ export function useProducts() {
         scraping,
         error: error instanceof Error ? error.message : null,
         scrapeUrlMutate,
-        refetch
+        refetch,
+        sortOption,
+        setSortOption
     };
 }

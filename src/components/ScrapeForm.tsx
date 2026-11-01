@@ -1,5 +1,4 @@
-import { Alert, Box, Button, CircularProgress, Paper, Snackbar, TextField } from "@mui/material";
-import SearchIcon from '@mui/icons-material/Search';
+import { Alert, Box, Button, Paper, Snackbar, TextField } from "@mui/material";
 import { useState, type SyntheticEvent } from "react";
 import type { Product } from "../types/product";
 
@@ -60,11 +59,8 @@ export function ScrapeForm({ onScrape, isLoading }: ScrapeFormProps) {
               color="primary"
               size="large"
               disabled={isLoading || !url.trim()}
-              startIcon={
-                isLoading ? <CircularProgress size={20} color="inherit" /> : <SearchIcon />
-              }
               sx={{
-                minWidth: { sm: '200px' },
+                minWidth: { sm: '220px' },
                 height: '56px',
                 fontWeight: 600,
                 whiteSpace: 'nowrap',

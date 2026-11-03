@@ -1,25 +1,28 @@
 import './App.css'
-import { 
-  Alert, 
-  Box, 
-  CircularProgress, 
-  Container, 
-  createTheme, 
-  ThemeProvider, 
+import {
+  Alert,
+  Box,
+  CircularProgress,
+  Container,
+  createTheme,
+  ThemeProvider,
   Typography,
-  Grid, 
-  CssBaseline, 
-  type SelectChangeEvent, 
-  FormControl, 
-  InputLabel, 
-  Select, 
-  MenuItem, 
+  Grid,
+  CssBaseline,
+  type SelectChangeEvent,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Pagination,
+  Backdrop,
 } from '@mui/material'
 import { Sort as SortIcon } from '@mui/icons-material';
 import { useProducts } from './hooks/useProducts'
 import { Header } from './components/Header'
 import { ScrapeForm } from './components/ScrapeForm'
 import { ProductCard } from './components/ProductCard'
+import type { ChangeEvent } from 'react';
 
 const theme = createTheme({
   palette: {
@@ -37,10 +40,26 @@ const theme = createTheme({
 });
 
 function App() {
-  const { products, loading, scraping, error, scrapeUrlMutate, sortOption, setSortOption } = useProducts();
+  const { 
+    products, 
+    loading, 
+    scraping, 
+    error, 
+    scrapeUrlMutate, 
+    sortOption, 
+    setSortOption,
+    totalPages,
+    page,
+    setPage,
+    isFetchingPage
+  } = useProducts();
 
   const handleSortChange = (event: SelectChangeEvent) => {
     setSortOption(event.target.value as any);
+  }
+
+  const handlePageChange = (_: ChangeEvent<unknown>, value: number) => {
+    setPage(value - 1)
   }
 
   return (
@@ -93,9 +112,44 @@ function App() {
                 </Grid>
               ))}
             </Grid>
+
+            {totalPages > 1 && (
+              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6, mb: 4 }}>
+                <Pagination
+                  count={totalPages}
+                  page={page + 1}
+                  onChange={handlePageChange}
+                  color="primary"
+                  size="large"
+                  disabled={isFetchingPage}
+                />
+              </Box>
+            )}
           </Box>
         )}
       </Container>
+      <Backdrop
+        sx={{
+          color: '#fff',
+          zIndex: (theme) => theme.zIndex.drawer + 1, 
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 3,
+          backdropFilter: 'blur(4px)' 
+        }}
+        open={scraping}
+      >
+        <CircularProgress color="inherit" size={60} thickness={4} />
+
+        <Box sx={{ textAlign: 'center', px: 2 }}>
+          <Typography variant="h5" sx={{ fontWeight: 600, mb: 1 }}>
+            Analisando comentários com Inteligência Artificial...
+          </Typography>
+          <Typography variant="body1" sx={{ opacity: 0.8 }}>
+            Isso pode levar alguns segundos dependendo do volume de avaliações no anúncio.
+          </Typography>
+        </Box>
+      </Backdrop>
     </ThemeProvider>
   );
 }

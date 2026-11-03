@@ -2,7 +2,7 @@ import type { PageResponse } from "../types/pageResponse";
 import type { Product, ProductSortOption } from "../types/product";
 import { extractErrorMessage } from "../utils/extractErrorMessage";
 
-const BASE_URL = 'http://localhost:8080/api/products';
+const BASE_URL = `${import.meta.env.VITE_API_URL}/products`;
 
 export function productService() {
     async function getAll(

@@ -1,8 +1,8 @@
-import type { SentimentType } from "./sentimentType";
+import type { SentimentType } from './sentimentType';
 
 export interface Rating {
-    id?: number;
-    originalText: string;
-    sentiment: SentimentType;
-    productId: number;
+  id?: number;
+  originalText: string;
+  sentiment: SentimentType;
+  productId?: number;
 }

@@ -1,4 +1,4 @@
-import './App.css'
+﻿import './App.css'
 import {
   Alert,
   Box,
@@ -15,7 +15,6 @@ import {
   Select,
   MenuItem,
   Pagination,
-  Backdrop,
 } from '@mui/material'
 import { Sort as SortIcon } from '@mui/icons-material';
 import { useProducts } from './hooks/useProducts'
@@ -23,6 +22,7 @@ import { Header } from './components/Header'
 import { ScrapeForm } from './components/ScrapeForm'
 import { ProductCard } from './components/ProductCard'
 import type { ChangeEvent } from 'react';
+import type { ProductSortOption } from './types/product';
 
 const theme = createTheme({
   palette: {
@@ -42,20 +42,20 @@ const theme = createTheme({
 function App() {
   const { 
     products, 
-    loading, 
-    scraping, 
+    loading,
     error, 
-    scrapeUrlMutate, 
+    search,
+    setSearch,
+    totalProducts, 
     sortOption, 
     setSortOption,
     totalPages,
     page,
     setPage,
-    isFetchingPage
   } = useProducts();
 
   const handleSortChange = (event: SelectChangeEvent) => {
-    setSortOption(event.target.value as any);
+    setSortOption(event.target.value as ProductSortOption);
   }
 
   const handlePageChange = (_: ChangeEvent<unknown>, value: number) => {
@@ -68,7 +68,7 @@ function App() {
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Header />
 
-        <ScrapeForm onScrape={scrapeUrlMutate} isLoading={scraping} />
+        <ScrapeForm search={search} onSearchChange={setSearch} />
 
         {error && (
           <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
@@ -79,13 +79,13 @@ function App() {
         {loading ? (
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 8 }}>
             <CircularProgress size={40} sx={{ mb: 2 }} />
-            <Typography color="text.secondary">Carregando análises salvas...</Typography>
+            <Typography color="text.secondary">Carregando produtos salvos...</Typography>
           </Box>
         ) : (
           <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
               <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 600 }}>
-                Produtos Analisados ({products.length})
+                Produtos coletados ({totalProducts})
               </Typography>
 
               <FormControl size="small" sx={{ minWidth: 220, bgcolor: 'background.paper' }}>
@@ -105,6 +105,14 @@ function App() {
               </FormControl>
             </Box>
 
+            {totalProducts === 0 && (
+              <Alert severity="info" sx={{ mb: 3 }}>
+                {search.trim()
+                  ? 'Nenhum produto encontrado para esta busca.'
+                  : 'Nenhum produto coletado ainda. Use a extensão do Chrome para adicionar produtos.'}
+              </Alert>
+            )}
+
             <Grid container spacing={3}>
               {products.map((product) => (
                 <Grid size={{ xs: 12, sm: 6, md: 4 }} key={product.id || product.originalLink}>
@@ -121,37 +129,16 @@ function App() {
                   onChange={handlePageChange}
                   color="primary"
                   size="large"
-                  disabled={isFetchingPage}
                 />
               </Box>
             )}
           </Box>
         )}
       </Container>
-      <Backdrop
-        sx={{
-          color: '#fff',
-          zIndex: (theme) => theme.zIndex.drawer + 1, 
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 3,
-          backdropFilter: 'blur(4px)' 
-        }}
-        open={scraping}
-      >
-        <CircularProgress color="inherit" size={60} thickness={4} />
-
-        <Box sx={{ textAlign: 'center', px: 2 }}>
-          <Typography variant="h5" sx={{ fontWeight: 600, mb: 1 }}>
-            Analisando comentários com Inteligência Artificial...
-          </Typography>
-          <Typography variant="body1" sx={{ opacity: 0.8 }}>
-            Isso pode levar alguns segundos dependendo do volume de avaliações no anúncio.
-          </Typography>
-        </Box>
-      </Backdrop>
     </ThemeProvider>
   );
 }
 
 export default App
+
+

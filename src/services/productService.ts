@@ -1,4 +1,4 @@
-import type { PageResponse } from "../types/pageResponse";
+﻿import type { PageResponse } from "../types/pageResponse";
 import type { Product, ProductSortOption } from "../types/product";
 import { extractErrorMessage } from "../utils/extractErrorMessage";
 
@@ -20,21 +20,5 @@ export function productService() {
         return response.json();
     }
 
-    async function scrapeUrl(url: string): Promise<Product> {
-        const response = await fetch(`${BASE_URL}/scrape?url=${encodeURIComponent(url)}`, {
-            method: 'POST'
-        });
-
-        if (!response.ok) {
-            const errorMessage = await extractErrorMessage(response, "Erro ao processar e raspar o produto.")
-            throw new Error(errorMessage);
-        }
-
-        return response.json();
-    }
-
-    return {
-        getAll,
-        scrapeUrl
-    }
+    return { getAll }
 }
